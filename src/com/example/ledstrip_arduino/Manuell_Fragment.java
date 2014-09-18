@@ -48,10 +48,8 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	
 	private OutputStream outputStream;
 	private InputStream inStream;
-	private boolean verbunden;
-	
-	
-	
+	private boolean verbunden;	
+	//testkommentar
 
 	public static final String EXTRA_MESSAGE = null;
 	
