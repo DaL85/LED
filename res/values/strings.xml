@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LED Strip</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="about_changelog">about_changelog</string>
+    <string name="about_msg">about_msg</string>
+    <string name="menue_beenden">beenden</string>
+    <string name="settings_Frequenzonoff">Frequenzsteuerung einschalten</string>
+    <string name="title_selection1">manuell</string>
+    <string name="title_selection2">automatisch</string>
+    <string name="button_onoff">LED einschalten</string>
+    <string name="title_selection3">frequenziell</string>
+    <string name="menue_bluetooth_setup">Bluetooth Einstellungen</string>
+    <string name="devicename">defaultdevice</string>
+    
+    
+    
+	<string name="action_settings">Settings</string>
+	<string name="Text">Status: -</string>
+	<string name="on">Turn On</string>
+	<string name="off">Turn Off</string>
+    <string name="List">List paired Devices</string>
+	    <string name="Find">Search new Devices / Cancel</string>
+</resources>

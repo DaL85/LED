@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="6.0"
+    android:orientation="vertical"
+    android:background="#000000" >
+
+    <TableLayout
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent">
+
+        <TableRow>
+            <Button
+                android:id="@+id/button_Frequenzonoff"
+                android:layout_weight="6.0"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_Frequenzonoff"
+                android:textColor="#fff" />
+        </TableRow>
+
+	  <LinearLayout
+        android:id="@+id/refresh_match_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="vertical"
+        android:visibility="visible" 
+        android:layout_weight="6.0">
+
+     	<TableLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"		   
+		    >
+		    <TableRow
+		        android:weightSum="6.0">
+		        <TextView
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+					android:padding="10dp"
+		            android:text="Frequenz"
+		            android:textColor="#fff"
+		            android:textSize="20sp"
+		            android:layout_weight="3" />
+		        <TextView
+		            android:id="@+id/Frequenzwert"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+					android:padding="10dp"
+		            android:text="Frequenzwert"
+		            android:textColor="#fff"
+		            android:textSize="20sp"
+		            android:gravity="right"
+		            android:layout_weight="3"  />
+	        </TableRow>    
+
+		    <TableRow>
+		        <SeekBar
+		            android:id="@+id/SeekBarFrequenz"
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"            
+		            android:layout_weight="1"
+		            android:max="255"
+		            android:minHeight="50dp"
+		            android:progressDrawable="@drawable/progress_horizontal"
+		            android:thumb="@drawable/btn_square_overlay_normal"
+		            android:thumbOffset="4px" />           
+        	</TableRow>
+    	</TableLayout>
+ 	</LinearLayout>
+ 
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>
