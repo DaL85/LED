@@ -38,7 +38,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListener{
 	
-
 	private Activity Main_Activity;
 	public void setActivity(Activity a)	{Main_Activity=a;}
 	
