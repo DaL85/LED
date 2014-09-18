@@ -1,9 +1,16 @@
 package com.example.ledstrip_arduino;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.AlertDialog.Builder;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 //import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +19,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.preference.PreferenceManager;
 
 
@@ -21,8 +29,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListener{
@@ -35,6 +46,13 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	
 	// change this to your Bluetooth device address 
 	private static final String DEVICE_ADDRESS =  "00:14:02:26:01:10";
+	
+	private OutputStream outputStream;
+	private InputStream inStream;
+	private boolean verbunden;
+	
+	
+	
 
 	public static final String EXTRA_MESSAGE = null;
 	
@@ -43,6 +61,7 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	SeekBar greenSB;
 	SeekBar blueSB;
 	View colorIndicator;
+	Button btnledeinschalten;
 	
 	int red, green, blue;
 	long lastChange;
@@ -71,6 +90,32 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         greenSB = (SeekBar) rootView.findViewById(R.id.SeekBarGreen);
         blueSB = (SeekBar) rootView.findViewById(R.id.SeekBarBlue);
         colorIndicator = rootView.findViewById(R.id.ColorIndicator);
+        btnledeinschalten=(Button)rootView.findViewById(R.id.button_LED_einschalten);
+        btnledeinschalten.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(!verbunden)
+				{
+					try{
+						init();
+						btnledeinschalten.setText("LED ausschalten");
+						verbunden=false;
+					}
+					catch(Exception e)
+					{
+						Log.e("error", "ManuelL_Fragment: Verbindung nicht aufbaubar");
+					}
+				}
+				else
+				{
+					btnledeinschalten.setText("LED einschalten");
+				}
+				
+			}
+        	
+        });
 
         // register listeners
         redSB.setOnSeekBarChangeListener(this);
@@ -118,6 +163,7 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         	}
         }.start();
         
+        
 	}
 
 	@Override
@@ -155,6 +201,58 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	public void onStopTrackingTouch(SeekBar seekBar) {
 		updateState(seekBar);
 	}
+	
+	private void init(){
+		verbunden=false;
+		  BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
+		  if (blueAdapter != null) {
+		      if (blueAdapter.isEnabled()) {
+		          //Set<BluetoothDevice> bondedDevices = blueAdapter.getBondedDevices();
+		
+		         // if(bondedDevices.size() > 0){
+		              //BluetoothDevice[] devices = (BluetoothDevice[]) bondedDevices.toArray();
+		    	  try{
+		    		  if(((MainActivity)Main_Activity).mac!="")
+		    		  {
+			              BluetoothDevice device = blueAdapter.getRemoteDevice(((MainActivity)Main_Activity).mac);
+			              ParcelUuid[] uuids = device.getUuids();
+			              BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
+			              socket.connect();
+			              outputStream = socket.getOutputStream();
+			              inStream = socket.getInputStream();
+			              verbunden=true;
+		    		  }
+		    		  else
+		    			  Toast.makeText(Main_Activity,"Kein Device ausgewählt",
+					                 Toast.LENGTH_LONG).show();
+		    	  }
+		    	  catch(Exception e)
+		    	  {
+		    		  Log.e("error", "Funktion init hat Fehler geworfen: "+e.getMessage());
+		    	  }
+		         // }
+		
+		          //Log.e("error", "No appropriate paired devices.");
+		      }
+		      else
+		      {
+		    	  Toast.makeText(Main_Activity,"Bluetooth is disabled",
+			                 Toast.LENGTH_LONG).show();
+		          Log.e("error", "Bluetooth is disabled.");
+		      }
+		  }
+	}
+	
+	
+	public void write(String s){
+	    try {
+			outputStream.write(s.getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.e("error", "Funktion write hat Fehler geworfen: "+e.getMessage());
+		}
+	}
+	
 
 	private void updateState(final SeekBar seekBar) {
 		

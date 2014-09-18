@@ -35,8 +35,8 @@ public final class R {
         public static final int SeekBarRed=0x7f080002;
         public static final int Time_layout=0x7f080005;
         public static final int bluetoothdevice=0x7f080013;
-        public static final int button1=0x7f08001e;
         public static final int button_Frequenzonoff=0x7f080014;
+        public static final int button_LED_einschalten=0x7f08001e;
         public static final int button_ausdimmen=0x7f08000c;
         public static final int button_automatik_onoff=0x7f08000d;
         public static final int button_devicesearch=0x7f080011;

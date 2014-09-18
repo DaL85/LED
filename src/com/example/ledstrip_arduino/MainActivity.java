@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
 	
 	private static final int RESULT_SETTING_BT = 3;
-	private String mac="";
+	public String mac="";
     SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
@@ -58,37 +58,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     
     
 
-//
-//private OutputStream outputStream;
-//private InputStream inStream;
-//
-//private void init() throws IOException {
-//    BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
-//    if (blueAdapter != null) {
-//        if (blueAdapter.isEnabled()) {
-//            Set<BluetoothDevice> bondedDevices = blueAdapter.getBondedDevices();
-//
-//            if(bondedDevices.size() > 0){
-//                BluetoothDevice[] devices = (BluetoothDevice[]) bondedDevices.toArray();
-//                BluetoothDevice device = devices[0];
-//                ParcelUuid[] uuids = device.getUuids();
-//                BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
-//                socket.connect();
-//                outputStream = socket.getOutputStream();
-//                inStream = socket.getInputStream();
-//            }
-//
-//            Log.e("error", "No appropriate paired devices.");
-//        }else{
-//            Log.e("error", "Bluetooth is disabled.");
-//        }
-//    }
-//}
-//
-//public void write(String s) throws IOException {
-//    outputStream.write(s.getBytes());
-//}
-//
+
+
+
 //public void run() {
 //    final int BUFFER_SIZE = 1024;
 //    byte[] buffer = new byte[BUFFER_SIZE];
