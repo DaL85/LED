@@ -19,6 +19,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
