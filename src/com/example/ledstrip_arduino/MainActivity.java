@@ -54,41 +54,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
     ViewPager mViewPager;
     
-    
-    
-    
-
-
-
-
-//public void run() {
-//    final int BUFFER_SIZE = 1024;
-//    byte[] buffer = new byte[BUFFER_SIZE];
-//    int bytes = 0;
-//    int b = BUFFER_SIZE;
-//
-//    while (true) {
-//        try {
-//            bytes = inStream.read(buffer, bytes, BUFFER_SIZE - bytes);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+ 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

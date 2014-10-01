@@ -93,45 +93,29 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 				case BluetoothViewerService.MSG_CONNECTED:
 					btnledeinschalten.setText("LED ausschalten");
 					connected = true;
-//					mStatusView.setText(formatStatusMessage(R.string.btstatus_connected_to_fmt, msg.obj));
-//					onBluetoothStateChanged();
-//					recording.setLength(0);
 					deviceName = msg.obj.toString();
 					break;
 				case BluetoothViewerService.MSG_CONNECTING:
 					connected = false;
-					//mStatusView.setText(formatStatusMessage(R.string.btstatus_connecting_to_fmt, msg.obj));
-					//onBluetoothStateChanged();
+					btnledeinschalten.setText("Verbindung wird aufgebaut");
 					break;
 				case BluetoothViewerService.MSG_NOT_CONNECTED:
 					connected = false;
 					btnledeinschalten.setText("LED einschalten");
-					//mStatusView.setText(R.string.btstatus_not_connected);
-					//onBluetoothStateChanged();
 					break;
 				case BluetoothViewerService.MSG_CONNECTION_FAILED:
 					connected = false;
-					//mStatusView.setText(R.string.btstatus_not_connected);
-					//onBluetoothStateChanged();
+					btnledeinschalten.setText("LED einschalten");
 					break;
 				case BluetoothViewerService.MSG_CONNECTION_LOST:
 					connected = false;
-					//mStatusView.setText(R.string.btstatus_not_connected);
-					//onBluetoothStateChanged();
+					btnledeinschalten.setText("LED einschalten");
 					break;
 				case BluetoothViewerService.MSG_BYTES_WRITTEN:
 					String written = new String((byte[]) msg.obj);
-					//mConversationArrayAdapter.add(">>> " + written);
 					Log.i(TAG, "written = '" + written + "'");
 					break;
 				case BluetoothViewerService.MSG_LINE_READ:
-					//if (paused) break;
-//					String line = (String) msg.obj;
-//					if (D) Log.d(TAG, line);
-//					mConversationArrayAdapter.add(line);
-//					if (recordingEnabled) {
-//						recording.append(line).append("\n");
-//					}
 					break;
 			}
 		}
@@ -148,14 +132,9 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState)
     {
-    View rootView = inflater.inflate(R.layout.manuell_fragment,
-    container, false);
+	    View rootView = inflater.inflate(R.layout.manuell_fragment,
+	    container, false);
 
-		//Amarino.connect(Main_Activity, DEVICE_ADDRESS);
-        
-        // get references to views defined in our main.xml layout file
-    
-    	
     	blueAdapter=BluetoothAdapter.getDefaultAdapter();
         redSB = (SeekBar) rootView.findViewById(R.id.SeekBarRed);
         greenSB = (SeekBar) rootView.findViewById(R.id.SeekBarGreen);
@@ -167,13 +146,6 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-//				BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
-//				blueAdapter.startDiscovery();
-//				//Main_Activity.registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-//				Main_Activity.registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_UUID));
-//				Main_Activity.registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
-//				Toast.makeText(Main_Activity,"Device: "+Main_Activity.mac,
-//		                 Toast.LENGTH_LONG).show();
 				if(!connected)
 				{
 					try{
@@ -185,16 +157,7 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 						}
 						catch(Exception e){
 							Log.e("error", "ConnectTread: "+e.getMessage());
-						}
-						
-						if(connected)//ist hier zu schnell da, evtl zweite taste oder etwas warten oder senden über seekbarlistener
-						{
-						
-						String h = "H";
-						mBluetoothService.write(h.getBytes());
-						//write("H");
-						}
-						
+						}						
 					}
 					catch(Exception e)
 					{
@@ -202,9 +165,8 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 					}
 				}
 				else
-				{
-					
-					connected=false;
+				{					
+					mBluetoothService.stop();
 				}
 				
 			}
@@ -247,15 +209,15 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         greenSB.setProgress(green);
         blueSB.setProgress(blue);
         colorIndicator.setBackgroundColor(Color.rgb(red, green, blue));
-        new Thread(){
-        	public void run(){
-        		try {
-					Thread.sleep(6000);
-				} catch (InterruptedException e) {}
-				Log.d(TAG, "update colors");
-        		updateAllColors();
-        	}
-        }.start();
+//        new Thread(){
+//        	public void run(){
+//        		try {
+//					Thread.sleep(6000);
+//				} catch (InterruptedException e) {}
+//				Log.d(TAG, "update colors");
+//        		updateAllColors();
+//        	}
+//        }.start();
         
         if(mBluetoothService==null){
         	mBluetoothService = new BluetoothViewerService(mHandler);
@@ -275,8 +237,6 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 				.putInt("blue_m", blue)
 			.commit();
 		
-		// stop Amarino's background service, we don't need it any more 
-		//Amarino.disconnect(Main_Activity, DEVICE_ADDRESS);
 	}
 
 
@@ -300,62 +260,6 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 		updateState(seekBar);
 	}
 	
-//	private void init(){
-//		verbunden=false;
-//		  BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
-//		  if (blueAdapter != null) {
-//		      if (blueAdapter.isEnabled()) {
-////		          Set<BluetoothDevice> bondedDevices = blueAdapter.getBondedDevices();
-////		
-////		          if(bondedDevices.size() > 0){
-////		              BluetoothDevice[] devices = (BluetoothDevice[]) bondedDevices.toArray();
-////		          }
-//		    	  try{
-//		    		  if(((MainActivity)Main_Activity).mac!="")
-//		    		  {
-//			              BluetoothDevice device = blueAdapter.getRemoteDevice(((MainActivity)Main_Activity).mac);
-//			              //ParcelUuid[] uuids = device.getUuids();
-//			              
-//			              BluetoothSocket socket = device.createRfcommSocketToServiceRecord(UUID.randomUUID());
-//			              socket.connect();
-//			              outputStream = socket.getOutputStream();
-//			              inStream = socket.getInputStream();
-//			              verbunden=true;
-//		    		  }
-//		    		  else
-//		    			  Toast.makeText(Main_Activity,"Kein Device ausgewählt",
-//					                 Toast.LENGTH_LONG).show();
-//		    	  }
-//		    	  catch(Exception e)
-//		    	  {
-//		    		  Toast.makeText(Main_Activity, "Funktion init hat Fehler geworfen: "+e.getMessage(),
-//				                 Toast.LENGTH_LONG).show();
-//		    		  Log.e("error", "Funktion init hat Fehler geworfen: "+e.getMessage());
-//		    	  }
-//		         // }
-//		
-//		          //Log.e("error", "No appropriate paired devices.");
-//		      }
-//		      else
-//		      {
-//		    	  Toast.makeText(Main_Activity,"Bluetooth is disabled",
-//			                 Toast.LENGTH_LONG).show();
-//		          Log.e("error", "Bluetooth is disabled.");
-//		      }
-//		  }
-//	}
-	
-
-//	public void write(String s){
-//	    try {
-//			outputStream.write(s.getBytes());
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			Log.e("error", "Funktion write hat Fehler geworfen: "+e.getMessage());
-//		}
-//	}
-//	
-
 	private void updateState(final SeekBar seekBar) {
 		
 		switch (seekBar.getId()){
@@ -384,18 +288,36 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	}
 	
 	private void updateRed(){
-		// I have chosen random small letters for the flag 'o' for red, 'p' for green and 'q' for blue
-		// you could select any small letter you want
-		// however be sure to match the character you register a function for your in Arduino sketch
-		//Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'o', red);
+		if(connected){
+			
+			String h = "#red_"+red+";";
+			mBluetoothService.write(h.getBytes());
+		}
+		else
+			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+	                 Toast.LENGTH_LONG).show();      
 	}
 	
 	private void updateGreen(){
-		//Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'p', green);
+		if(connected){
+			
+			String h = "#green_"+green+";";
+			mBluetoothService.write(h.getBytes());
+		}
+		else
+			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+	                 Toast.LENGTH_LONG).show();      
 	}
 	
 	private void updateBlue(){
-		//Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'q', blue);
+		if(connected){
+			
+			String h = "#blue_"+blue+";";
+			mBluetoothService.write(h.getBytes());
+		}
+		else
+			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+	                 Toast.LENGTH_LONG).show();      
 	}
 	
 	public static String getVersion(Context context) {

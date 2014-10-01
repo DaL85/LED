@@ -69,7 +69,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
     {
     	View rootView = inflater.inflate(R.layout.automatik_fragment,
     			container, false);
-    			Amarino.connect(Main_Activity, DEVICE_ADDRESS);
+    			
     			// get references to views defined in our main.xml layout file
     			redSB = (SeekBar) rootView.findViewById(R.id.SeekBarRed);
     			greenSB = (SeekBar) rootView.findViewById(R.id.SeekBarGreen);
@@ -161,9 +161,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 				.putInt("blue_a", blue)
 			.commit();
 		
-		// stop Amarino's background service, we don't need it any more 
-		Amarino.disconnect(Main_Activity, DEVICE_ADDRESS);
-	}
+			}
 
 
 
@@ -188,18 +186,18 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 
 	private void updateState(final SeekBar seekBar) {
 		switch (seekBar.getId()){
-		case R.id.SeekBarRed:
-		red = seekBar.getProgress();
-		updateRed();
-		break;
-		case R.id.SeekBarGreen:
-		green = seekBar.getProgress();
-		updateGreen();
-		break;
-		case R.id.SeekBarBlue:
-		blue = seekBar.getProgress();
-		updateBlue();
-		break;
+			case R.id.SeekBarRed:
+				red = seekBar.getProgress();
+				updateRed();
+				break;
+			case R.id.SeekBarGreen:
+				green = seekBar.getProgress();
+				updateGreen();
+				break;
+			case R.id.SeekBarBlue:
+				blue = seekBar.getProgress();
+				updateBlue();
+				break;
 		}
 		// provide user feedback
 		colorIndicator.setBackgroundColor(Color.rgb(red, green, blue));
@@ -211,28 +209,25 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		updateBlue();
 		}
 		private void updateRed(){
-		// I have chosen random small letters for the flag 'o' for red, 'p' for green and 'q' for blue
-		// you could select any small letter you want
-		// however be sure to match the character you register a function for your in Arduino sketch
-		Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'o', red);
+		
 		}
 		private void updateGreen(){
-		Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'p', green);
+		
 		}
 		private void updateBlue(){
-		Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'q', blue);
+		
 		}
 		private void updateAndimmuhrzeit(String Time)
 		{
-		Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'x', Time);
+		
 		}
 		private void updatePeroideAusdimmen(String Periode)
 		{
-		Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'y', Periode);
+		
 		}
 		private void updatePeroideAndimmen(String Periode)
 		{
-		Amarino.sendDataToArduino(Main_Activity, DEVICE_ADDRESS, 'z', Periode);
+		
 		}
 	
 }
