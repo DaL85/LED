@@ -10,10 +10,13 @@
     <string name="settings_Frequenzonoff">Frequenzsteuerung einschalten</string>
     <string name="title_selection1">manuell</string>
     <string name="title_selection2">automatisch</string>
-    <string name="button_onoff">LED einschalten</string>
+    <string name="button_manuell_onoff">manuelle Steuerung aktivieren</string>
     <string name="title_selection3">frequenziell</string>
     <string name="menue_bluetooth_setup">Bluetooth Einstellungen</string>
     <string name="devicename">defaultdevice</string>
+    <string name="textview_manuell">Bluetoothstatus: </string>
+    <string name="textview_automatik">Bluetoothstatus: </string>
+    
     
     
     

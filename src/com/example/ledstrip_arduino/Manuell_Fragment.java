@@ -45,6 +45,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
@@ -53,75 +54,27 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	private MainActivity Main_Activity;
 	public void setActivity(MainActivity a)	{Main_Activity=a;}
 	
-	private static final String TAG = "MultiColorLamp";	
-	
-	// change this to your Bluetooth device address 
-	private static final String DEVICE_ADDRESS =  "00:14:02:26:01:10";
-	
-	private OutputStream outputStream;
-	private InputStream inStream;
-	private boolean connected;	
-	
-	private String deviceName;
-	
-	private BluetoothAdapter blueAdapter;
-	private BluetoothViewerService mBluetoothService;
-
+	private static final String TAG = "Manuell_Fragment";	
 	public static final String EXTRA_MESSAGE = null;
 
-	protected static final Menu devices = null;
+	//protected static final Menu devices = null;
 
-	List list = null;
+	//List list = null;
 	
 	final int DELAY = 150;
-	SeekBar redSB;
-	SeekBar greenSB;
-	SeekBar blueSB;
-	View colorIndicator;
-	Button btnledeinschalten;
+	private SeekBar redSB;
+	private SeekBar greenSB;
+	private SeekBar blueSB;
+	private View colorIndicator;
+	private Button btn_manuell_onoff;
+	private TextView tv_manuell_bluetoothstatus;
+	private Thread tv_thread;
 	
 	int red, green, blue;
 	long lastChange;
-	public Manuell_Fragment(){
-		
-	}
-	// The Handler that gets information back from the BluetoothService
-	private final Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-				case BluetoothViewerService.MSG_CONNECTED:
-					btnledeinschalten.setText("LED ausschalten");
-					connected = true;
-					deviceName = msg.obj.toString();
-					break;
-				case BluetoothViewerService.MSG_CONNECTING:
-					connected = false;
-					btnledeinschalten.setText("Verbindung wird aufgebaut");
-					break;
-				case BluetoothViewerService.MSG_NOT_CONNECTED:
-					connected = false;
-					btnledeinschalten.setText("LED einschalten");
-					break;
-				case BluetoothViewerService.MSG_CONNECTION_FAILED:
-					connected = false;
-					btnledeinschalten.setText("LED einschalten");
-					break;
-				case BluetoothViewerService.MSG_CONNECTION_LOST:
-					connected = false;
-					btnledeinschalten.setText("LED einschalten");
-					break;
-				case BluetoothViewerService.MSG_BYTES_WRITTEN:
-					String written = new String((byte[]) msg.obj);
-					Log.i(TAG, "written = '" + written + "'");
-					break;
-				case BluetoothViewerService.MSG_LINE_READ:
-					break;
-			}
-		}
-	};
-
-
+	private boolean manuell_onoff = false;
+	public Manuell_Fragment(){}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 	super.onCreate(savedInstanceState);
@@ -135,42 +88,26 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	    View rootView = inflater.inflate(R.layout.manuell_fragment,
 	    container, false);
 
-    	blueAdapter=BluetoothAdapter.getDefaultAdapter();
+    	
         redSB = (SeekBar) rootView.findViewById(R.id.SeekBarRed);
         greenSB = (SeekBar) rootView.findViewById(R.id.SeekBarGreen);
         blueSB = (SeekBar) rootView.findViewById(R.id.SeekBarBlue);
         colorIndicator = rootView.findViewById(R.id.ColorIndicator);
-        btnledeinschalten=(Button)rootView.findViewById(R.id.button_LED_einschalten);
-        btnledeinschalten.setOnClickListener(new OnClickListener(){
-
+        tv_manuell_bluetoothstatus = (TextView) rootView.findViewById(R.id.textview_manuell_bluetoothstatus);
+        btn_manuell_onoff=(Button)rootView.findViewById(R.id.button_manuell_onoff);
+        btn_manuell_onoff.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if(!connected)
-				{
-					try{
-						//init();
-						BluetoothDevice device = blueAdapter.getRemoteDevice(((MainActivity)Main_Activity).mac);
-						try{
-						mBluetoothService.connect(device);
-						
-						}
-						catch(Exception e){
-							Log.e("error", "ConnectTread: "+e.getMessage());
-						}						
-					}
-					catch(Exception e)
-					{
-						Log.e("error", "ManuelL_Fragment: Verbindung nicht aufbaubar");
-					}
+				// TODO Auto-generated method stub	
+				if(!manuell_onoff){
+					manuell_onoff=true;
+					btn_manuell_onoff.setText("manuelle Steuerung deaktivieren");
 				}
-				else
-				{					
-					mBluetoothService.stop();
-				}
-				
-			}
-        	
+				else{
+					manuell_onoff=false;
+					btn_manuell_onoff.setText("manuelle Steuerung aktivieren");
+				}				
+			}        	
         });
 
         // register listeners
@@ -178,6 +115,7 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         greenSB.setOnSeekBarChangeListener(this);
         blueSB.setOnSeekBarChangeListener(this);
         
+        Main_Activity.registerReceiver(bReceiver, new IntentFilter(Main_Activity.BROADCASTACTION)); 
         return rootView;
     }
     
@@ -197,7 +135,6 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	@Override
 	public void onStart() {
 		super.onStart();
-
 		// load last state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Main_Activity);
         red = prefs.getInt("red_m", 0);
@@ -209,21 +146,6 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         greenSB.setProgress(green);
         blueSB.setProgress(blue);
         colorIndicator.setBackgroundColor(Color.rgb(red, green, blue));
-//        new Thread(){
-//        	public void run(){
-//        		try {
-//					Thread.sleep(6000);
-//				} catch (InterruptedException e) {}
-//				Log.d(TAG, "update colors");
-//        		updateAllColors();
-//        	}
-//        }.start();
-        
-        if(mBluetoothService==null){
-        	mBluetoothService = new BluetoothViewerService(mHandler);
-        }
-        
-        
 	}
 
 	@Override
@@ -260,6 +182,16 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 		updateState(seekBar);
 	}
 	
+	 final BroadcastReceiver bReceiver = new BroadcastReceiver() {
+	        public void onReceive(Context context, Intent intent) {
+	            String action = intent.getAction();
+	            // When discovery finds a device
+	            if (action.startsWith(Main_Activity.BROADCASTACTION)) {
+	            	tv_manuell_bluetoothstatus.setText(Main_Activity.bluetoothstatus);
+	            }
+	        }
+	    };
+	
 	private void updateState(final SeekBar seekBar) {
 		
 		switch (seekBar.getId()){
@@ -288,10 +220,10 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	}
 	
 	private void updateRed(){
-		if(connected){
+		if(Main_Activity.connected){
 			
 			String h = "#red_"+red+";";
-			mBluetoothService.write(h.getBytes());
+			Main_Activity.mBluetoothService.write(h.getBytes());
 		}
 		else
 			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
@@ -299,10 +231,10 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	}
 	
 	private void updateGreen(){
-		if(connected){
+		if(Main_Activity.connected){
 			
 			String h = "#green_"+green+";";
-			mBluetoothService.write(h.getBytes());
+			Main_Activity.mBluetoothService.write(h.getBytes());
 		}
 		else
 			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
@@ -310,25 +242,13 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	}
 	
 	private void updateBlue(){
-		if(connected){
+		if(Main_Activity.connected){
 			
 			String h = "#blue_"+blue+";";
-			mBluetoothService.write(h.getBytes());
+			Main_Activity.mBluetoothService.write(h.getBytes());
 		}
 		else
 			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
 	                 Toast.LENGTH_LONG).show();      
 	}
-	
-	public static String getVersion(Context context) {
-		String version = "1.0"; 
-		try { 
-			PackageInfo pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0); 
-		    version = pi.versionName; 
-		} catch (PackageManager.NameNotFoundException e) { 
-		    Log.e(TAG, "Package name not found", e); 
-		} 
-		return version;
-	}
-	
 }

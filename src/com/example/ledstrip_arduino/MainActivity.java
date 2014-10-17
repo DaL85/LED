@@ -14,12 +14,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,13 +49,62 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
 	
 	private static final int RESULT_SETTING_BT = 3;
+	private static final String TAG = "MainActivity";
+	public static final String BROADCASTACTION = "com.example.ledstrip_arduino_bluetoothstatus";
+	
 	public String mac="";
+	public String deviceName;
+	public BluetoothAdapter blueAdapter;
+	public BluetoothViewerService mBluetoothService;
+	public boolean connected;
+	public String bluetoothstatus="";
+	private Intent intentbluetoothstatus = new Intent();
+	
+
+	
     SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+    
+    
+ // The Handler that gets information back from the BluetoothService
+ 	private final Handler mHandler = new Handler() {
+ 		@Override
+ 		public void handleMessage(Message msg) {
+ 			switch (msg.what) {
+ 				case BluetoothViewerService.MSG_CONNECTED:  					
+ 					bluetoothstatus = "connected with "+mac;
+ 					connected = true;
+ 					deviceName = msg.obj.toString();
+ 					break;
+ 				case BluetoothViewerService.MSG_CONNECTING:
+ 					bluetoothstatus = "connecting with "+mac;
+ 					connected = false; 					
+ 					break;
+ 				case BluetoothViewerService.MSG_NOT_CONNECTED:
+ 					bluetoothstatus = "not connected";
+ 					connected = false; 					
+ 					break;
+ 				case BluetoothViewerService.MSG_CONNECTION_FAILED:
+ 					bluetoothstatus = "connection failed with "+mac;
+ 					connected = false; 					
+ 					break;
+ 				case BluetoothViewerService.MSG_CONNECTION_LOST:
+ 					bluetoothstatus = "connection lost with "+mac;
+ 					connected = false; 					
+ 					break;
+ 				case BluetoothViewerService.MSG_BYTES_WRITTEN:
+ 					//String written = new String((byte[]) msg.obj);
+ 					break;
+ 				case BluetoothViewerService.MSG_LINE_READ:
+ 					break;
+ 			} 			
+			sendBroadcast(intentbluetoothstatus);
+ 		}
+ 	};
     
  
     @Override
@@ -61,6 +113,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         
         
         setContentView(R.layout.main_activity);
+        blueAdapter=BluetoothAdapter.getDefaultAdapter();
+        intentbluetoothstatus.setAction(BROADCASTACTION);
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
@@ -69,7 +123,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the app.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mSectionsPagerAdapter.setActivity(this);
+        //mSectionsPagerAdapter.setActivity(this);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -96,18 +150,41 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
-        
+
     }
     
     @Override
     protected void onResume(){
     	super.onResume();
+    	
     	if(mac=="")
     		Toast.makeText(getApplicationContext(),"no bluetooth device is selected",
 	                 Toast.LENGTH_LONG).show();        
-        else
-        	Toast.makeText(getApplicationContext(),"Used Device: "+mac,
-	                 Toast.LENGTH_LONG).show();
+        else	//Device vorhanden, Verbindung wird aufgebaut
+        {
+        	if(mBluetoothService==null)
+        	{
+            	mBluetoothService = new BluetoothViewerService(mHandler);
+            }
+        	if(!connected)
+			{
+        		Toast.makeText(getApplicationContext(),"trying to connect to Used Device: "+mac,
+   	                 Toast.LENGTH_LONG).show();
+				try{					
+					BluetoothDevice device = blueAdapter.getRemoteDevice(mac);
+					try{
+						mBluetoothService.connect(device);
+					}
+					catch(Exception e){
+						Log.e("error", "ConnectTread: "+e.getMessage());
+					}						
+				}
+				catch(Exception e)
+				{
+					Log.e("error", "Manuell_Fragment: Verbindung nicht aufbaubar");
+				}
+			}        	
+        }
     }
    
     @Override
@@ -134,13 +211,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
     
     @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // When the given tab is selected, switch to the corresponding page in
-        // the ViewPager.
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-    
-    @Override
     public boolean onOptionsItemSelected(MenuItem item){
 	    switch(item.getItemId()){
 	    case R.id.menue_bluetooth_setup:	    	
@@ -154,7 +224,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		     builder.setMessage("Wollen Sie LED Strip wirklich beenden?");		    
 		     builder.setPositiveButton("JA", new DialogInterface.OnClickListener() {	    
 			     @Override
-			     public void onClick(DialogInterface dialog, int which) {			    
+			     public void onClick(DialogInterface dialog, int which) {	
+			    	 if(connected)			    						
+			 			mBluetoothService.stop();
+			 			
 				     System.exit(0);				    
 				     dialog.dismiss();
 			     }	    
@@ -177,6 +250,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	    	 return super.onOptionsItemSelected(item);
 	     }
     }
+    
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        // When the given tab is selected, switch to the corresponding page in
+        // the ViewPager.
+        mViewPager.setCurrentItem(tab.getPosition());
+    }
+    
+  
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
@@ -192,8 +274,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    	private Activity Main_Activity;
-    	public void setActivity(Activity a)	{Main_Activity=a;}
+//    	private Activity Main_Activity;
+//    	public void setActivity(Activity a)	{Main_Activity=a;}
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
