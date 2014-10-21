@@ -93,6 +93,7 @@ public class EinstellungActivity extends ListActivity{
 					@Override
 					public void onItemClick(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
+						
 				    item_array=BTArrayAdapter.getItem(arg2).split("\n");
 					//Toast.makeText(getBaseContext(), "Name:" + item_array[0]+ " Adresse: "+item_array[1] , Toast.LENGTH_SHORT).show();
 
@@ -106,6 +107,10 @@ public class EinstellungActivity extends ListActivity{
 								     intent.putExtra("com.example.ledstrip_arduino.mac", item_array[1]);
 								     EinstellungActivity.this.setResult(RESULT_SETTING_BT,intent);
 								     dialog.dismiss();
+								     if (!myBluetoothAdapter.isEnabled()) {
+								         Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+								         startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
+								         }
 								     EinstellungActivity.this.finish();
 								     
 							     }	 

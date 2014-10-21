@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * intensive, it may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-	
+	private static final int REQUEST_ENABLE_BT = 1;
 	private static final int RESULT_SETTING_BT = 3;
 	private static final String TAG = "MainActivity";
 	public static final String BROADCASTACTION= "com.example.ledstrip_arduino";
@@ -166,7 +166,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onResume(){
     	super.onResume();
-    	
+    	if(!blueAdapter.isEnabled()){
+    		Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+	        startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
+    	}
     	if(mac=="")
     		Toast.makeText(getApplicationContext(),"no bluetooth device is selected",
 	                 Toast.LENGTH_LONG).show();        
@@ -284,8 +287,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-//    	private Activity Main_Activity;
-//    	public void setActivity(Activity a)	{Main_Activity=a;}
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -303,9 +304,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             case 1:
             	f= new Automatik_Fragment();
             	break;
-            case 2:
-            	f =new Frequenz_Fragment();
-            	break;
+//            case 2:	//Braucht Thilo nicht
+//            	f =new Frequenz_Fragment();
+//            	break;
            
             }
             return f;
@@ -314,7 +315,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
@@ -325,8 +326,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     return getString(R.string.title_selection1).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_selection2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_selection3).toUpperCase(l);
+//                case 2:
+//                    return getString(R.string.title_selection3).toUpperCase(l);
                
             }
             return null;

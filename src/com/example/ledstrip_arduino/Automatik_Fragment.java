@@ -126,14 +126,6 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 			
 			@Override
 			public void onClick(View v) {
-//				if(!automatik_onoff){
-//					automatik_onoff=true;
-//					btn_automatik_onoff.setText("automatische Steuerung deaktivieren");
-//				}
-//				else{
-//					automatik_onoff=false;
-//					btn_automatik_onoff.setText("automatische Steuerung aktivieren");
-//				}	
 				if(!automatik_onoff)
 					Main_Activity.active="automatik";
 				else
