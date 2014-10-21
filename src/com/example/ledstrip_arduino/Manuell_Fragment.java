@@ -52,10 +52,11 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListener{
 	
 	private MainActivity Main_Activity;
-	public void setActivity(MainActivity a)	{Main_Activity=a;}
-	
+//	public void setActivity(MainActivity a)	{Main_Activity=a;}
+//	
 	private static final String TAG = "Manuell_Fragment";	
 	public static final String EXTRA_MESSAGE = null;
+	private static final String MANUELL_ACTIVE = "m_a";
 
 	//protected static final Menu devices = null;
 
@@ -68,7 +69,8 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	private View colorIndicator;
 	private Button btn_manuell_onoff;
 	private TextView tv_manuell_bluetoothstatus;
-	private Thread tv_thread;
+	
+	private Intent intentactive = new Intent();
 	
 	int red, green, blue;
 	long lastChange;
@@ -87,6 +89,9 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
     {
 	    View rootView = inflater.inflate(R.layout.manuell_fragment,
 	    container, false);
+	    
+	    intentactive.setAction(Main_Activity.BROADCASTACTION);
+    	intentactive.putExtra("extra", Main_Activity.BROADCASTEXTRA_ACTIVE);
 
     	
         redSB = (SeekBar) rootView.findViewById(R.id.SeekBarRed);
@@ -97,16 +102,13 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         btn_manuell_onoff=(Button)rootView.findViewById(R.id.button_manuell_onoff);
         btn_manuell_onoff.setOnClickListener(new OnClickListener(){
 			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub	
-				if(!manuell_onoff){
-					manuell_onoff=true;
-					btn_manuell_onoff.setText("manuelle Steuerung deaktivieren");
-				}
-				else{
-					manuell_onoff=false;
-					btn_manuell_onoff.setText("manuelle Steuerung aktivieren");
-				}				
+			public void onClick(View v) {	
+				if(!manuell_onoff)
+					Main_Activity.active="manuell";
+				else
+					Main_Activity.active="";
+				
+				Main_Activity.sendBroadcast(intentactive);	
 			}        	
         });
 
@@ -116,6 +118,7 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         blueSB.setOnSeekBarChangeListener(this);
         
         Main_Activity.registerReceiver(bReceiver, new IntentFilter(Main_Activity.BROADCASTACTION)); 
+       
         return rootView;
     }
     
@@ -185,13 +188,25 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	 final BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	        public void onReceive(Context context, Intent intent) {
 	            String action = intent.getAction();
-	            // When discovery finds a device
-	            if (action.startsWith(Main_Activity.BROADCASTACTION)) {
-	            	tv_manuell_bluetoothstatus.setText(Main_Activity.bluetoothstatus);
-	            }
+	            String extra = intent.getStringExtra("extra");
+	            if(action.startsWith(Main_Activity.BROADCASTACTION)){
+			            if(extra.startsWith(Main_Activity.BROADCASTEXTRA_ACTIVE)){
+			            	if(Main_Activity.active=="manuell"){
+			            		manuell_onoff=true;
+			            		btn_manuell_onoff.setText("manuelle Steuerung deaktivieren");
+			            	}
+			            	else{
+			            		manuell_onoff=false;
+			            		btn_manuell_onoff.setText("manuelle Steuerung aktivieren");
+			            	}
+			            }
+			            else if(extra.startsWith(Main_Activity.BROADCASTEXTRA_BTSTATUS)){
+			            	tv_manuell_bluetoothstatus.setText(Main_Activity.bluetoothstatus);
+			            }
+			        }
 	        }
-	    };
-	
+    };
+    
 	private void updateState(final SeekBar seekBar) {
 		
 		switch (seekBar.getId()){
@@ -220,35 +235,51 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 	}
 	
 	private void updateRed(){
-		if(Main_Activity.connected){
-			
-			String h = "#red_"+red+";";
-			Main_Activity.mBluetoothService.write(h.getBytes());
+		if(manuell_onoff){
+			if(Main_Activity.connected){
+				
+				String h = "#red_"+red+";";
+				Main_Activity.mBluetoothService.write(h.getBytes());
+			}
+			else
+				Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+		                 Toast.LENGTH_LONG).show();     
 		}
 		else
-			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
-	                 Toast.LENGTH_LONG).show();      
+			Toast.makeText(Main_Activity,"manuelle Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 
 	}
 	
 	private void updateGreen(){
-		if(Main_Activity.connected){
-			
-			String h = "#green_"+green+";";
-			Main_Activity.mBluetoothService.write(h.getBytes());
+		if(manuell_onoff){
+			if(Main_Activity.connected){
+				
+				String h = "#green_"+green+";";
+				Main_Activity.mBluetoothService.write(h.getBytes());
+			}
+			else
+				Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+	                 Toast.LENGTH_LONG).show();  
 		}
 		else
-			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
-	                 Toast.LENGTH_LONG).show();      
+			Toast.makeText(Main_Activity,"manuelle Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 
 	}
 	
 	private void updateBlue(){
-		if(Main_Activity.connected){
-			
-			String h = "#blue_"+blue+";";
-			Main_Activity.mBluetoothService.write(h.getBytes());
+		if(manuell_onoff){
+			if(Main_Activity.connected){
+				
+				String h = "#blue_"+blue+";";
+				Main_Activity.mBluetoothService.write(h.getBytes());
+			}
+			else
+				Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+		                 Toast.LENGTH_LONG).show();      
+	
 		}
 		else
-			Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
-	                 Toast.LENGTH_LONG).show();      
+			Toast.makeText(Main_Activity,"manuelle Steuerung ist deaktiviert",
+                 Toast.LENGTH_LONG).show(); 
 	}
 }

@@ -27,40 +27,41 @@ public final class R {
         public static final int progress_horizontal=0x7f020003;
     }
     public static final class id {
-        public static final int ColorIndicator=0x7f080001;
-        public static final int Frequenzwert=0x7f080016;
-        public static final int SeekBarBlue=0x7f080004;
-        public static final int SeekBarFrequenz=0x7f080017;
-        public static final int SeekBarGreen=0x7f080003;
-        public static final int SeekBarRed=0x7f080002;
-        public static final int Time_layout=0x7f080005;
-        public static final int bluetoothdevice=0x7f080013;
-        public static final int button_Frequenzonoff=0x7f080014;
-        public static final int button_ausdimmen=0x7f08000c;
-        public static final int button_automatik_onoff=0x7f08000d;
-        public static final int button_devicesearch=0x7f080011;
-        public static final int button_manuell_onoff=0x7f08001f;
-        public static final int editText_andimmuhrzeit=0x7f080007;
-        public static final int editText_periode_andimmen=0x7f080009;
-        public static final int editText_periode_ausdimmen=0x7f08000b;
+        public static final int ColorIndicator=0x7f080002;
+        public static final int Frequenzwert=0x7f080017;
+        public static final int SeekBarBlue=0x7f080005;
+        public static final int SeekBarFrequenz=0x7f080018;
+        public static final int SeekBarGreen=0x7f080004;
+        public static final int SeekBarRed=0x7f080003;
+        public static final int Time_layout=0x7f080006;
+        public static final int bluetoothdevice=0x7f080014;
+        public static final int button_Frequenzonoff=0x7f080015;
+        public static final int button_ausdimmen=0x7f08000d;
+        public static final int button_automatik_onoff=0x7f08000e;
+        public static final int button_devicesearch=0x7f080012;
+        public static final int button_manuell_onoff=0x7f080020;
+        public static final int editText_andimmuhrzeit=0x7f080008;
+        public static final int editText_periode_andimmen=0x7f08000a;
+        public static final int editText_periode_ausdimmen=0x7f08000c;
         public static final int main=0x7f080000;
-        public static final int menue_beenden=0x7f080021;
-        public static final int menue_bluetooth_setup=0x7f080020;
-        public static final int pager=0x7f08001d;
-        public static final int refresh_match_layout=0x7f080015;
-        public static final int scrollView=0x7f08001c;
-        public static final int search=0x7f080010;
-        public static final int tableRow3=0x7f080018;
-        public static final int tableRow4=0x7f080019;
-        public static final int tableRow5=0x7f08001a;
-        public static final int tableRow6=0x7f08001b;
-        public static final int text=0x7f08000f;
-        public static final int textView_ZAn=0x7f080008;
-        public static final int textView_ZAus=0x7f08000a;
-        public static final int textview_andimmuhrzeit=0x7f080006;
-        public static final int textview_availabledevices=0x7f080012;
-        public static final int textview_b_item=0x7f08000e;
-        public static final int textview_manuell_bluetoothstatus=0x7f08001e;
+        public static final int menue_beenden=0x7f080022;
+        public static final int menue_bluetooth_setup=0x7f080021;
+        public static final int pager=0x7f08001e;
+        public static final int refresh_match_layout=0x7f080016;
+        public static final int scrollView=0x7f08001d;
+        public static final int search=0x7f080011;
+        public static final int tableRow3=0x7f080019;
+        public static final int tableRow4=0x7f08001a;
+        public static final int tableRow5=0x7f08001b;
+        public static final int tableRow6=0x7f08001c;
+        public static final int text=0x7f080010;
+        public static final int textView_ZAn=0x7f080009;
+        public static final int textView_ZAus=0x7f08000b;
+        public static final int textview_andimmuhrzeit=0x7f080007;
+        public static final int textview_automatik_bluetoothstatus=0x7f080001;
+        public static final int textview_availabledevices=0x7f080013;
+        public static final int textview_b_item=0x7f08000f;
+        public static final int textview_manuell_bluetoothstatus=0x7f08001f;
     }
     public static final class layout {
         public static final int automatik_fragment=0x7f030000;
@@ -76,28 +77,29 @@ public final class R {
         public static final int optionsmenue=0x7f070000;
     }
     public static final class string {
-        public static final int Find=0x7f050015;
-        public static final int List=0x7f050014;
-        public static final int Text=0x7f050011;
+        public static final int Find=0x7f050016;
+        public static final int List=0x7f050015;
+        public static final int Text=0x7f050012;
         public static final int about_changelog=0x7f050004;
         public static final int about_msg=0x7f050005;
-        public static final int action_settings=0x7f050010;
+        public static final int action_settings=0x7f050011;
         public static final int app_name=0x7f050000;
         public static final int blue=0x7f050003;
+        public static final int button_automatik_onoff=0x7f05000b;
         public static final int button_manuell_onoff=0x7f05000a;
-        public static final int devicename=0x7f05000d;
+        public static final int devicename=0x7f05000e;
         public static final int green=0x7f050002;
         public static final int menue_beenden=0x7f050006;
-        public static final int menue_bluetooth_setup=0x7f05000c;
-        public static final int off=0x7f050013;
-        public static final int on=0x7f050012;
+        public static final int menue_bluetooth_setup=0x7f05000d;
+        public static final int off=0x7f050014;
+        public static final int on=0x7f050013;
         public static final int red=0x7f050001;
         public static final int settings_Frequenzonoff=0x7f050007;
-        public static final int textview_automatik=0x7f05000f;
-        public static final int textview_manuell=0x7f05000e;
+        public static final int textview_automatik=0x7f050010;
+        public static final int textview_manuell=0x7f05000f;
         public static final int title_selection1=0x7f050008;
         public static final int title_selection2=0x7f050009;
-        public static final int title_selection3=0x7f05000b;
+        public static final int title_selection3=0x7f05000c;
     }
     public static final class style {
         /** 

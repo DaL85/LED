@@ -50,15 +50,18 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	private static final int RESULT_SETTING_BT = 3;
 	private static final String TAG = "MainActivity";
-	public static final String BROADCASTACTION = "com.example.ledstrip_arduino_bluetoothstatus";
-	
+	public static final String BROADCASTACTION= "com.example.ledstrip_arduino";
+	public static final String BROADCASTEXTRA_ACTIVE = "active";
+	public static final String BROADCASTEXTRA_BTSTATUS = "status";
 	public String mac="";
 	public String deviceName;
 	public BluetoothAdapter blueAdapter;
 	public BluetoothViewerService mBluetoothService;
 	public boolean connected;
 	public String bluetoothstatus="";
+	public String active="";
 	private Intent intentbluetoothstatus = new Intent();
+	
 	
 
 	
@@ -75,25 +78,30 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
  		@Override
  		public void handleMessage(Message msg) {
  			switch (msg.what) {
- 				case BluetoothViewerService.MSG_CONNECTED:  					
+ 				case BluetoothViewerService.MSG_CONNECTED:   					
  					bluetoothstatus = "connected with "+mac;
+ 					intentbluetoothstatus.putExtra("extra", bluetoothstatus);
  					connected = true;
  					deviceName = msg.obj.toString();
  					break;
  				case BluetoothViewerService.MSG_CONNECTING:
  					bluetoothstatus = "connecting with "+mac;
+ 					intentbluetoothstatus.putExtra("extra", bluetoothstatus);
  					connected = false; 					
  					break;
  				case BluetoothViewerService.MSG_NOT_CONNECTED:
  					bluetoothstatus = "not connected";
+ 					intentbluetoothstatus.putExtra("extra", bluetoothstatus);
  					connected = false; 					
  					break;
  				case BluetoothViewerService.MSG_CONNECTION_FAILED:
  					bluetoothstatus = "connection failed with "+mac;
+ 					intentbluetoothstatus.putExtra("extra", bluetoothstatus);
  					connected = false; 					
  					break;
  				case BluetoothViewerService.MSG_CONNECTION_LOST:
  					bluetoothstatus = "connection lost with "+mac;
+ 					intentbluetoothstatus.putExtra("extra", bluetoothstatus);
  					connected = false; 					
  					break;
  				case BluetoothViewerService.MSG_BYTES_WRITTEN:
@@ -115,6 +123,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         setContentView(R.layout.main_activity);
         blueAdapter=BluetoothAdapter.getDefaultAdapter();
         intentbluetoothstatus.setAction(BROADCASTACTION);
+        intentbluetoothstatus.putExtra("extra", BROADCASTEXTRA_BTSTATUS);
+       
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
