@@ -1,5 +1,9 @@
 package com.example.ledstrip_arduino;
 
+
+import java.sql.Date;
+import java.text.DateFormat;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +36,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
@@ -43,7 +49,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 	private static final String AUTOMATIK_ACTIVE = "a_a";
 	
 	// change this to your Bluetooth device address 
-	private static final String DEVICE_ADDRESS =  "00:14:02:26:01:10";
+	//private static final String DEVICE_ADDRESS =  "00:14:02:26:01:10";
 
 	public static final String EXTRA_MESSAGE = null;
 	final int DELAY = 150;
@@ -168,15 +174,6 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
         greenSB.setProgress(green);
         blueSB.setProgress(blue);
         colorIndicator.setBackgroundColor(Color.rgb(red, green, blue));
-        new Thread(){
-        	public void run(){
-        		try {
-					Thread.sleep(6000);
-				} catch (InterruptedException e) {}
-				Log.d(TAG, "update colors");
-        		updateAllColors();
-        	}
-        }.start();
         
 	}
 
@@ -202,6 +199,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		            	if(Main_Activity.active=="automatik"){
 		            		automatik_onoff=true;
 		            		btn_automatik_onoff.setText("automatische Steuerung deaktivieren");
+		            		updateall(); //alle eingegebenen Werte werden gesendet, sind nicht alle Felder geschrieben wird nichts gesendet
 		            	}
 		            	else{
 		            		automatik_onoff=false;
@@ -261,16 +259,62 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		updateBlue();
 		}
 		private void updateRed(){
-		
+			
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					
+					
+					
+					
+					String h = "#red_"+red+";";
+					Main_Activity.mBluetoothService.write(h.getBytes());
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+			                 Toast.LENGTH_LONG).show();     
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+		                 Toast.LENGTH_LONG).show(); 
 		}
+		
 		private void updateGreen(){
-		
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					
+					String h = "#green_"+green+";";
+					Main_Activity.mBluetoothService.write(h.getBytes());
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+		                 Toast.LENGTH_LONG).show();  
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+		                 Toast.LENGTH_LONG).show(); 
 		}
-		private void updateBlue(){
 		
+		private void updateBlue(){
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					
+					String h = "#blue_"+blue+";";
+					Main_Activity.mBluetoothService.write(h.getBytes());
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+			                 Toast.LENGTH_LONG).show();      
+		
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 
 		}
 		private void updateAndimmuhrzeit(String Time)
 		{
+			long currentTime = System.currentTimeMillis();
+			//DateFormat.getInstance().format(currentTime);
+			DateFormat.getTimeInstance().format(new Date(currentTime));
 		
 		}
 		private void updatePeroideAusdimmen(String Periode)
@@ -280,6 +324,15 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		private void updatePeroideAndimmen(String Periode)
 		{
 		
+		}
+		private void updateall(){//alle eingegebenen Werte werden gesendet, sind nicht alle Felder geschrieben wird nichts gesendet
+			long currentTime = System.currentTimeMillis();
+			DateFormat[] formats = new DateFormat[] {							   
+					   DateFormat.getTimeInstance()
+					 };
+			String date = formats[0].format(new Date(currentTime));
+			
+			
 		}
 	
 }
