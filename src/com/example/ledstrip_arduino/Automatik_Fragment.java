@@ -115,7 +115,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		Periode_Ausdimmen.addTextChangedListener(new TextWatcher() {
 		@Override
 		public void afterTextChanged(Editable s) {
-		updatePeroideAusdimmen(Periode_Ausdimmen.getText().toString());
+		updatePeroideAusdimmen();
 		}
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -123,7 +123,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		Periode_Andimmen.addTextChangedListener(new TextWatcher() {
 		@Override
 		public void afterTextChanged(Editable s) {
-		updatePeroideAndimmen(Periode_Andimmen.getText().toString());
+		updatePeroideAndimmen();
 		}
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -261,11 +261,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		private void updateRed(){
 			
 			if(automatik_onoff){
-				if(Main_Activity.connected){
-					
-					
-					
-					
+				if(Main_Activity.connected){					
 					String h = "#red_"+red+";";
 					Main_Activity.mBluetoothService.write(h.getBytes());
 				}
@@ -280,8 +276,7 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		
 		private void updateGreen(){
 			if(automatik_onoff){
-				if(Main_Activity.connected){
-					
+				if(Main_Activity.connected){					
 					String h = "#green_"+green+";";
 					Main_Activity.mBluetoothService.write(h.getBytes());
 				}
@@ -296,20 +291,19 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		
 		private void updateBlue(){
 			if(automatik_onoff){
-				if(Main_Activity.connected){
-					
+				if(Main_Activity.connected){					
 					String h = "#blue_"+blue+";";
 					Main_Activity.mBluetoothService.write(h.getBytes());
 				}
 				else
 					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
-			                 Toast.LENGTH_LONG).show();      
-		
+			                 Toast.LENGTH_LONG).show(); 		
 			}
 			else
 				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
 	                 Toast.LENGTH_LONG).show(); 
 		}
+		
 		private void updateAndimmuhrzeit(String Time)
 		{
 			long currentTime = System.currentTimeMillis();
@@ -317,22 +311,64 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 			DateFormat.getTimeInstance().format(new Date(currentTime));
 		
 		}
-		private void updatePeroideAusdimmen(String Periode)
+		
+		private void updatePeroideAusdimmen()
+		{			
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					String s = "#paus_"+Periode_Ausdimmen.getText().toString()+";";
+					Main_Activity.mBluetoothService.write(s.getBytes());
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+			                 Toast.LENGTH_LONG).show(); 
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 		
+		}
+		
+		private void updatePeroideAndimmen()
 		{
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					String s = "#pan_"+Periode_Andimmen.getText().toString()+";";
+					Main_Activity.mBluetoothService.write(s.getBytes());
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+			                 Toast.LENGTH_LONG).show(); 
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 		
 		
 		}
-		private void updatePeroideAndimmen(String Periode)
-		{
 		
+		private void updateall(){//alle eingegebenen Werte werden gesendet, sind nicht alle Felder geschrieben wird nichts gesendet			
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					sendTime();
+					updateAllColors();
+					updatePeroideAusdimmen();
+					updatePeroideAndimmen();
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+			                 Toast.LENGTH_LONG).show(); 
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 			
 		}
-		private void updateall(){//alle eingegebenen Werte werden gesendet, sind nicht alle Felder geschrieben wird nichts gesendet
+		
+		private void sendTime(){
 			long currentTime = System.currentTimeMillis();
 			DateFormat[] formats = new DateFormat[] {							   
 					   DateFormat.getTimeInstance()
 					 };
-			String date = formats[0].format(new Date(currentTime));
-			
-			
+			String date = "#time_"+formats[0].format(new Date(currentTime))+";";
+			Main_Activity.mBluetoothService.write(date.getBytes());
 		}
 	
 }
