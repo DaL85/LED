@@ -95,8 +95,11 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		blueSB = (SeekBar) rootView.findViewById(R.id.SeekBarBlue);
 		colorIndicator = rootView.findViewById(R.id.ColorIndicator);
 		Andimmuhrzeit=(EditText)rootView.findViewById(R.id.editText_andimmuhrzeit);
+		Andimmuhrzeit.setText("hh:mm");
 		Periode_Ausdimmen=(EditText)rootView.findViewById(R.id.editText_periode_ausdimmen);
+		Periode_Ausdimmen.setText("mm");
 		Periode_Andimmen=(EditText)rootView.findViewById(R.id.editText_periode_andimmen);
+		Periode_Andimmen.setText("mm");
 		btn_automatik_onoff=(Button)rootView.findViewById(R.id.button_automatik_onoff);
 		tv_automatik_bluetoothstatus=(TextView)rootView.findViewById(R.id.textview_automatik_bluetoothstatus);
 		
@@ -107,7 +110,9 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		Andimmuhrzeit.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {
-			updateAndimmuhrzeit(Andimmuhrzeit.getText().toString());
+				String st = formatstring_hhmm(Andimmuhrzeit.getText().toString());
+				if(st!="")
+					updateAndimmuhrzeit(st);
 			}
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -304,11 +309,23 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 	                 Toast.LENGTH_LONG).show(); 
 		}
 		
-		private void updateAndimmuhrzeit(String Time)
+		private void updateAndimmuhrzeit(String s)
 		{
-			long currentTime = System.currentTimeMillis();
-			//DateFormat.getInstance().format(currentTime);
-			DateFormat.getTimeInstance().format(new Date(currentTime));
+			if(automatik_onoff){
+				if(Main_Activity.connected){
+					Toast.makeText(Main_Activity,"String s: "+s,
+			                 Toast.LENGTH_LONG).show();
+					s = "#tan_"+s+";";
+					Main_Activity.mBluetoothService.write(s.getBytes());
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+			                 Toast.LENGTH_LONG).show(); 
+			}
+			else
+				Toast.makeText(Main_Activity,"automatische Steuerung ist deaktiviert",
+	                 Toast.LENGTH_LONG).show(); 	
+		
 		
 		}
 		
@@ -369,6 +386,37 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 					 };
 			String date = "#time_"+formats[0].format(new Date(currentTime))+";";
 			Main_Activity.mBluetoothService.write(date.getBytes());
+		}
+		private String formatstring_hhmm(String s){
+			String temp = "";
+			int count=0;
+			for(int i=0;i<s.length();i++){	
+				
+				if(s.charAt(i)==':'){
+					count=0;
+					if(i>=3){
+						return "";
+					}					
+					temp=temp+s.charAt(i);
+					if(i==1)
+						temp='0'+temp;					
+				}
+				else
+				{
+					if(count<2)
+						temp=temp+s.charAt(i);
+					else
+					{
+						Toast.makeText(Main_Activity,"Format hh:mm beachten",
+				                 Toast.LENGTH_LONG).show(); 
+						return "";
+					}
+					count++;
+				}				
+				
+					
+			}
+			return temp;
 		}
 	
 }
