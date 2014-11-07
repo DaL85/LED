@@ -139,12 +139,20 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 			
 			@Override
 			public void onClick(View v) {
-				if(!automatik_onoff)
-					Main_Activity.active="automatik";
-				else
-					Main_Activity.active="";
 				
-				Main_Activity.sendBroadcast(intentactive);
+				if(Main_Activity.connected){					
+					if(!automatik_onoff)
+						Main_Activity.active="automatik";
+					else
+						Main_Activity.active="";
+					
+					Main_Activity.sendBroadcast(intentactive);
+				}
+				else
+					Toast.makeText(Main_Activity,"nicht verbunden -> aktivieren nicht möglich",
+			                 Toast.LENGTH_LONG).show();     
+				
+				
 			}
 		});
 		btn_ausdimmen.setOnClickListener(new OnClickListener() {
@@ -223,7 +231,15 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		            if(extra.startsWith(Main_Activity.BROADCASTEXTRA_ACTIVE)){
 		            	if(Main_Activity.active=="automatik"){
 		            		automatik_onoff=true;
-		            		btn_automatik_onoff.setText("automatische Steuerung deaktivieren");
+		            		btn_automatik_onoff.setText("automatische Steuerung deaktivieren");		            		
+	        				if(Main_Activity.connected){					
+	        					String h = "#auto_;";
+	        					Main_Activity.mBluetoothService.write(h.getBytes());
+	        				}
+	        				else
+	        					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+	        			                 Toast.LENGTH_LONG).show();     
+		        			
 		            		updateall(); //alle eingegebenen Werte werden gesendet, sind nicht alle Felder geschrieben wird nichts gesendet
 		            	}
 		            	else{

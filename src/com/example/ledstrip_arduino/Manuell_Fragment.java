@@ -102,13 +102,18 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
         btn_manuell_onoff=(Button)rootView.findViewById(R.id.button_manuell_onoff);
         btn_manuell_onoff.setOnClickListener(new OnClickListener(){
 			@Override
-			public void onClick(View v) {	
-				if(!manuell_onoff)
-					Main_Activity.active="manuell";
+			public void onClick(View v) {					
+				if(Main_Activity.connected){					
+					if(!manuell_onoff)
+						Main_Activity.active="manuell";
+					else
+						Main_Activity.active="";
+					
+					Main_Activity.sendBroadcast(intentactive);	
+				}
 				else
-					Main_Activity.active="";
-				
-				Main_Activity.sendBroadcast(intentactive);	
+					Toast.makeText(Main_Activity,"nicht verbunden -> aktivieren nicht möglich",
+			                 Toast.LENGTH_LONG).show();     
 			}        	
         });
 
@@ -194,6 +199,13 @@ public class Manuell_Fragment extends Fragment implements OnSeekBarChangeListene
 			            	if(Main_Activity.active=="manuell"){
 			            		manuell_onoff=true;
 			            		btn_manuell_onoff.setText("manuelle Steuerung deaktivieren");
+			            		if(Main_Activity.connected){					
+		        					String h = "#man_;";
+		        					Main_Activity.mBluetoothService.write(h.getBytes());
+		        				}
+		        				else
+		        					Toast.makeText(Main_Activity,"nicht verbunden -> senden nicht möglich",
+		        			                 Toast.LENGTH_LONG).show();   
 			            	}
 			            	else{
 			            		manuell_onoff=false;
