@@ -24,6 +24,9 @@ import android.preference.PreferenceManager;
 
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
 
 import android.util.Log;
@@ -58,7 +61,8 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 	private SeekBar blueSB;
 	private View colorIndicator;
 	private TextView tv_automatik_bluetoothstatus;
-	private EditText Andimmuhrzeit;
+	private EditText Andimmuhrzeit_Stunde;
+	private EditText Andimmuhrzeit_Minute;
 	private EditText Periode_Ausdimmen;
 	private EditText Periode_Andimmen;
 	private Button btn_automatik_onoff;
@@ -96,8 +100,8 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		greenSB = (SeekBar) rootView.findViewById(R.id.SeekBarGreen);
 		blueSB = (SeekBar) rootView.findViewById(R.id.SeekBarBlue);
 		colorIndicator = rootView.findViewById(R.id.ColorIndicator);
-		Andimmuhrzeit=(EditText)rootView.findViewById(R.id.editText_andimmuhrzeit);
-		Andimmuhrzeit.setText("hh:mm");
+		Andimmuhrzeit_Stunde=(EditText)rootView.findViewById(R.id.editText_Andimmuhrzeit_Stunde);
+		Andimmuhrzeit_Minute=(EditText)rootView.findViewById(R.id.editText_Andimmuhrzeit_Minute);
 		Periode_Ausdimmen=(EditText)rootView.findViewById(R.id.editText_periode_ausdimmen);
 		Periode_Ausdimmen.setText("mm");
 		Periode_Andimmen=(EditText)rootView.findViewById(R.id.editText_periode_andimmen);
@@ -110,15 +114,61 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		redSB.setOnSeekBarChangeListener(this);
 		greenSB.setOnSeekBarChangeListener(this);
 		blueSB.setOnSeekBarChangeListener(this);
-		Andimmuhrzeit.addTextChangedListener(new TextWatcher() {
+		
+
+		InputFilter filterMax2Digits = new InputFilter() {
+		    @Override
+		    public CharSequence filter(CharSequence source, int start, int end,
+		            Spanned dest, int dstart, int dend) {
+
+		        if (source instanceof SpannableStringBuilder) {
+		            SpannableStringBuilder sourceAsSpannableBuilder = (SpannableStringBuilder)source;
+		            for (int i = end - 1; i >= start; i--) { 
+		                char currentChar = source.charAt(i);
+		                 if (!Character.isDigit(currentChar)|| dstart<2 || dend < 2) {    
+		                     sourceAsSpannableBuilder.delete(i, i+1);
+		                 }     
+		            }
+		            return source;
+		        } else {
+		            StringBuilder filteredStringBuilder = new StringBuilder();
+		            for (int i = start; i < end; i++) { 
+		                char currentChar = source.charAt(i);
+		                if (Character.isDigit(currentChar)) { 
+		                	if(dstart<2 || dend <2)
+		                		filteredStringBuilder.append(currentChar);
+		                }     
+		            }
+		            return filteredStringBuilder.toString();
+		        }
+		    }
+		};
+		
+		Andimmuhrzeit_Stunde.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {
-				andimmuhrzeit = formatstring_hhmm(Andimmuhrzeit.getText().toString());
-				updateall();
+				if(!Andimmuhrzeit_Stunde.getText().toString().contains("h") && !Andimmuhrzeit_Minute.getText().toString().contains("m")){
+					andimmuhrzeit = Andimmuhrzeit_Stunde.getText().toString()+":"+Andimmuhrzeit_Minute.getText().toString();
+					updateall();
+				}
 			}
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			});
+		Andimmuhrzeit_Stunde.setFilters(new InputFilter[] { filterMax2Digits });
+		Andimmuhrzeit_Minute.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(!Andimmuhrzeit_Stunde.getText().toString().contains("h") && !Andimmuhrzeit_Minute.getText().toString().contains("m")){
+					andimmuhrzeit = Andimmuhrzeit_Stunde.getText().toString()+":"+Andimmuhrzeit_Minute.getText().toString();
+					updateall();
+				}				
+			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			});
+		Andimmuhrzeit_Minute.setFilters(new InputFilter[] { filterMax2Digits });
+		
 		Periode_Ausdimmen.addTextChangedListener(new TextWatcher() {
 		@Override
 		public void afterTextChanged(Editable s) {
@@ -127,6 +177,8 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		public void onTextChanged(CharSequence s, int start, int before, int count) {}
 		});
+		Periode_Ausdimmen.setFilters(new InputFilter[] { filterMax2Digits });
+		
 		Periode_Andimmen.addTextChangedListener(new TextWatcher() {
 		@Override
 		public void afterTextChanged(Editable s) {
@@ -135,6 +187,8 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 		public void onTextChanged(CharSequence s, int start, int before, int count) {}
 		});
+		Periode_Andimmen.setFilters(new InputFilter[] { filterMax2Digits });
+		
 		btn_automatik_onoff.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -351,8 +405,6 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 				if(automatik_onoff){
 					if(Main_Activity.connected){						
 						String s = "#tan_"+andimmuhrzeit+";";
-						Toast.makeText(Main_Activity,"String s: "+s,
-				                 Toast.LENGTH_LONG).show();
 						Main_Activity.mBluetoothService.write(s.getBytes());
 					}
 					else
@@ -429,37 +481,6 @@ public class Automatik_Fragment extends Fragment implements OnSeekBarChangeListe
 					 };
 			String date = "#time_"+formats[0].format(new Date(currentTime))+";";
 			Main_Activity.mBluetoothService.write(date.getBytes());
-		}
-		private String formatstring_hhmm(String s){
-			String temp = "";
-			int count=0;
-			for(int i=0;i<s.length();i++){	
-				
-				if(s.charAt(i)==':'){
-					count=0;
-					if(i>=3){
-						return "";
-					}					
-					temp=temp+s.charAt(i);
-					if(i==1)
-						temp='0'+temp;					
-				}
-				else
-				{
-					if(count<2)
-						temp=temp+s.charAt(i);
-					else
-					{
-						Toast.makeText(Main_Activity,"Format hh:mm beachten",
-				                 Toast.LENGTH_LONG).show(); 
-						return "";
-					}
-					count++;
-				}				
-				
-					
-			}
-			return temp;
 		}
 	
 }
